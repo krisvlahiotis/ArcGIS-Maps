@@ -29,19 +29,22 @@ auk_date(date = c("1993-01-01", "2023-01-01")) %>%
 auk_protocol(protocol = c("Stationary", "Traveling")) %>% 
 auk_complete()
 ebd_filters
+auk_filter(ebd_filters)
 
 #Output files
 data_dir <- "data"
 if (!dir.exists(data_dir)) {
   dir.create(data_dir)
 }
+# only run if the files don't already exist
+if (!file.exists(f_ebd)) {
+  auk_filter(ebd_filters, file = f_ebd, file_sampling = f_sampling)
+  
 #Insert two new filtered files
 f_ebd <- file.path(data_dir, "")
 f_sampling <- file.path(data_dir, "")
 
-# only run if the files don't already exist
-if (!file.exists(f_ebd)) {
-  auk_filter(ebd_filters, file = f_ebd, file_sampling = f_sampling)
+
 }
 
 #GIS Layers
