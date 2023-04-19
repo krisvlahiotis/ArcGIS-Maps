@@ -14,18 +14,30 @@ library(lubridate)
 library(sf)
 library(gridExtra)
 library(tidyverse)
+<<<<<<< HEAD
 library(dplyr)
+=======
+
+>>>>>>> 09be6019d2952c31cddeff6c1a05ed84c00d8927
 
 #To avoid future problems#
 select <- dplyr::select
 
+<<<<<<< HEAD
 #Set-up Data Directory# 
+=======
+#Set-up Data Directory 
+>>>>>>> 09be6019d2952c31cddeff6c1a05ed84c00d8927
 dir.create("data", showWarnings = FALSE)
 
 ebd <- auk_ebd("ebd_CA-ON_bkcchi_199001_202301_relDec-2022.txt", 
                file_sampling = "ebd_sampling_relDec-2022.txt")
 
+<<<<<<< HEAD
 ##Filtering the data#
+=======
+#Filtering the data#
+>>>>>>> 09be6019d2952c31cddeff6c1a05ed84c00d8927
 ebd_filters <- ebd %>% 
   auk_species("Black-capped Chickadee") %>% 
   # lower great lakes bcr
@@ -38,7 +50,10 @@ ebd_filters <- ebd %>%
 ebd_filters
 
 ##AWK Script not working, moving on##  
+<<<<<<< HEAD
 ##Update it worked????##
+=======
+>>>>>>> 09be6019d2952c31cddeff6c1a05ed84c00d8927
 # output files
 data_dir <- "data"
 if (!dir.exists(data_dir)) {
@@ -52,6 +67,7 @@ if (!file.exists(f_ebd)) {
   auk_filter(ebd_filters, file = f_ebd, file_sampling = f_sampling)
 }
 
+<<<<<<< HEAD
 ####Zero Filling###
 f_ebd <- ("ebd_bcchi_clean.txt")
 f_sampling <-("ebd_checklists_clean.txt")
@@ -247,3 +263,28 @@ ne_country_lines <- read_sf("data/gis-data.gpkg", "ne_country_lines") %>%
 ne_state_lines <- read_sf("data/gis-data.gpkg", "ne_state_lines") %>% 
   st_transform(crs = map_proj) %>% 
   st_geometry()
+=======
+
+###################################
+ebd_dir <- "/Users/marleyabdull/Downloads/Kristen's Data/ebd_CA-ON_bkcchi_199001_202301_relDec-2022.txt"
+
+# ebd
+f <- file.path (ebd_dir, "ebd_CA-ON_bkcchi_199001_202301_relDec-2022.txt")
+f_clean <- file.path (ebd_dir, "ebd_relbcchi_clean.txt")
+auk_clean(f, f_out = f_clean, remove_text = TRUE)
+# sampling
+f_sampling <- file.path(ebd_dir, "ebd_sampling_relMay-2018.txt")
+f_sampling_clean <- file.path(ebd_dir, "ebd_sampling_relDec-2022_clean.txt")
+auk_clean(f, f_out = f_sampling_clean, remove_text = TRUE)
+
+# define the paths to ebd and sampling event files
+f_in_ebd <- file.path(ebd_dir, "ebd_relbcchi_clean.txt")
+f_in_sampling <- file.path(ebd_dir, "ebd_sampling_relDec-2022_clean.txt")
+# create an object referencing these files
+auk_ebd(file = f_in_ebd, file_sampling = f_in_sampling)
+
+
+
+
+
+>>>>>>> 09be6019d2952c31cddeff6c1a05ed84c00d8927
