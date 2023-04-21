@@ -5,39 +5,24 @@ install.packages("sf")
 install.packages("gridExtra")
 install.packages ("tidyverse")
 
-#Set Path
-auk_set_ebd_path("~/Downloads/Kristen's Data/")
-
 #Loading Packages#
 library(auk)
 library(lubridate)
 library(sf)
 library(gridExtra)
 library(tidyverse)
-<<<<<<< HEAD
 library(dplyr)
-=======
-
->>>>>>> 09be6019d2952c31cddeff6c1a05ed84c00d8927
 
 #To avoid future problems#
 select <- dplyr::select
 
-<<<<<<< HEAD
 #Set-up Data Directory# 
-=======
-#Set-up Data Directory 
->>>>>>> 09be6019d2952c31cddeff6c1a05ed84c00d8927
 dir.create("data", showWarnings = FALSE)
 
 ebd <- auk_ebd("ebd_CA-ON_bkcchi_199001_202301_relDec-2022.txt", 
                file_sampling = "ebd_sampling_relDec-2022.txt")
 
-<<<<<<< HEAD
 ##Filtering the data#
-=======
-#Filtering the data#
->>>>>>> 09be6019d2952c31cddeff6c1a05ed84c00d8927
 ebd_filters <- ebd %>% 
   auk_species("Black-capped Chickadee") %>% 
   # lower great lakes bcr
@@ -50,10 +35,7 @@ ebd_filters <- ebd %>%
 ebd_filters
 
 ##AWK Script not working, moving on##  
-<<<<<<< HEAD
 ##Update it worked????##
-=======
->>>>>>> 09be6019d2952c31cddeff6c1a05ed84c00d8927
 # output files
 data_dir <- "data"
 if (!dir.exists(data_dir)) {
@@ -67,7 +49,6 @@ if (!file.exists(f_ebd)) {
   auk_filter(ebd_filters, file = f_ebd, file_sampling = f_sampling)
 }
 
-<<<<<<< HEAD
 ####Zero Filling###
 f_ebd <- ("ebd_bcchi_clean.txt")
 f_sampling <-("ebd_checklists_clean.txt")
@@ -134,24 +115,18 @@ if (!dir.exists(gpkg_dir)) {
 }
 f_ne <- file.path(gpkg_dir, "gis-data.gpkg")
 
-# download bcrs
-tmp_dir <- normalizePath(tempdir())
-tmp_bcr <- file.path(tmp_dir, "bcr.zip")
-paste0("https://www.birdscanada.org/research/gislab/download/", 
-       "bcr_terrestrial_shape.zip") %>% 
-  download.file(destfile = tmp_bcr)
-unzip(tmp_bcr, exdir = tmp_dir)
-bcr <- file.path(tmp_dir, "BCR_Terrestrial_master_International.shp") %>% 
-  read_sf() %>% 
-  select(bcr_code = BCR, bcr_name = LABEL) %>% 
-  filter(bcr_code == 13)
+##Reading in shapefile##
+bcr<-read_sf ("BCR_Terrestrial_master_International.shp")
+view(bcr)
 
-  
-#my file path#
-bcr <- ("BCR_Terrestrial_master_International.shp")
-read_sf() %>% 
-  select(bcr_code = BCR, bcr_name = LABEL) %>% 
-  filter(bcr_code == 13)
+# filtering shape file to only select data from Southern Ontariobcr_SouthernOntario<- bcr %>%
+bcr_SouthernOntario<- bcr %>%
+  select(bcr_code = BCR, bcr_name = Label) %>% 
+  filter(bcr_code == 13)  
+
+# verifying that the data are representative of Southern Ontario
+plot(bcr_SouthernOntario)
+
 # clean up
 list.files(tmp_dir, "bcr", ignore.case = TRUE, full.names = TRUE) %>% 
   unlink()
@@ -188,103 +163,3 @@ write_sf(ne_country_lines, f_ne, "ne_country_lines")
 write_sf(ne_state_lines, f_ne, "ne_state_lines")
 write_sf(bcr, f_ne, "bcr")
 
-#Did not work#
-read_sf
-install.packages("sf")
-library(sf)
-#Trying Again#
-st_transform(crs = "ESRI:102003")
-map_proj <- st_crs(ESRI:102003)
-ne_land <- read_sf("gis-data.gpkg", "ne_land") %>% 
-  st_transform(crs = map_proj) %>% 
-  st_geometry()
-bcr <- read_sf("data/gis-data.gpkg", "bcr") %>% 
-  st_transform(crs = map_proj) %>% 
-  st_geometry()
-ne_country_lines <- read_sf("data/gis-data.gpkg", "ne_country_lines") %>% 
-  st_transform(crs = map_proj) %>% 
-  st_geometry()
-ne_state_lines <- read_sf("data/gis-data.gpkg", "ne_state_lines") %>% 
-  st_transform(crs = map_proj) %>% 
-  st_geometry()
-
-##Relative Abundance##
-library(raster)
-library(dggridR)
-library(pdp)
-library(mgcv)
-library(fitdistrplus)
-library(viridis)
-library(fields)
-# resolve namespace conflicts
-select <- dplyr::select
-map <- purrr::map
-projection <- raster::projection
-
-# set random number seed to insure fully repeatable results
-set.seed(1)
-
-# setup output directory for saved results
-if (!dir.exists("output")) {
-  dir.create("output")
-}
-
-# ebird data
-ebird <- read_csv("data/ebd_woothr_june_bcr27_zf.csv") %>% 
-  mutate(protocol_type = factor(protocol_type, 
-                                levels = c("Stationary" , "Traveling"))) %>%
-  # remove observations with no count
-  filter(!is.na(observation_count))
-
-# modis habitat covariates
-habitat <- read_csv("data/pland-elev_location-year.csv") %>% 
-  mutate(year = as.integer(year))
-
-# combine ebird and habitat data
-ebird_habitat <- inner_join(ebird, habitat, by = c("locality_id", "year"))
-
-# prediction surface
-pred_surface <- read_csv("data/pland-elev_prediction-surface.csv")
-# latest year of landcover data
-max_lc_year <- pred_surface$year[1]
-r <- raster("data/prediction-surface.tif")
-
-# load gis data for making maps
-map_proj <- st_crs(102003)
-ne_land <- read_sf("data/gis-data.gpkg", "ne_land") %>% 
-  st_transform(crs = map_proj) %>% 
-  st_geometry()
-bcr <- read_sf("data/gis-data.gpkg", "bcr") %>% 
-  st_transform(crs = map_proj) %>% 
-  st_geometry()
-ne_country_lines <- read_sf("data/gis-data.gpkg", "ne_country_lines") %>% 
-  st_transform(crs = map_proj) %>% 
-  st_geometry()
-ne_state_lines <- read_sf("data/gis-data.gpkg", "ne_state_lines") %>% 
-  st_transform(crs = map_proj) %>% 
-  st_geometry()
-=======
-
-###################################
-ebd_dir <- "/Users/marleyabdull/Downloads/Kristen's Data/ebd_CA-ON_bkcchi_199001_202301_relDec-2022.txt"
-
-# ebd
-f <- file.path (ebd_dir, "ebd_CA-ON_bkcchi_199001_202301_relDec-2022.txt")
-f_clean <- file.path (ebd_dir, "ebd_relbcchi_clean.txt")
-auk_clean(f, f_out = f_clean, remove_text = TRUE)
-# sampling
-f_sampling <- file.path(ebd_dir, "ebd_sampling_relMay-2018.txt")
-f_sampling_clean <- file.path(ebd_dir, "ebd_sampling_relDec-2022_clean.txt")
-auk_clean(f, f_out = f_sampling_clean, remove_text = TRUE)
-
-# define the paths to ebd and sampling event files
-f_in_ebd <- file.path(ebd_dir, "ebd_relbcchi_clean.txt")
-f_in_sampling <- file.path(ebd_dir, "ebd_sampling_relDec-2022_clean.txt")
-# create an object referencing these files
-auk_ebd(file = f_in_ebd, file_sampling = f_in_sampling)
-
-
-
-
-
->>>>>>> 09be6019d2952c31cddeff6c1a05ed84c00d8927
